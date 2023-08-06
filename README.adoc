@@ -23,7 +23,7 @@ This will extract some useful information from the files.
 
 == State
 
-* Working / personal use.
+* Working on it.
 
 == Requirements
 
