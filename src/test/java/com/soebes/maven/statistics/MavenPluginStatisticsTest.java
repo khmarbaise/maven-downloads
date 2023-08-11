@@ -93,15 +93,13 @@ class MavenPluginStatisticsTest {
         .sorted(YEAR_MONTH_COMPARATOR)
         .forEach(s -> {
           var sumOfDownloadsPerMonth = s.lines().stream().mapToLong(MavenPlugin::numberOfDownloads).sum();
-          out.printf("Year: %04d %02d %3d %,15d %n", s.year(), s.month(), s.lines().size(), sumOfDownloadsPerMonth);
+          out.printf("Year: %04d Month: %02d Number of plugins: %3d downloads: %,15d %n", s.year(), s.month(), s.lines().size(), sumOfDownloadsPerMonth);
 
           s.lines().stream()
               .sorted(Comparator.comparing(MavenPlugin::plugin))
               .forEachOrdered(l -> out.printf(" %-36s %,10d%n", l.plugin(), l.numberOfDownloads()));
 
         });
-
-    out.println("---------------------------------------------------------------------------");
 
     record PluginDownloadNumber(String plugin, long numberOfDownloads) {
 
@@ -116,6 +114,10 @@ class MavenPluginStatisticsTest {
         .mapToLong(LongSummaryStatistics::getSum).sum();
 
 
+    out.println("---------------------------------------------------------------------------");
+    out.println(" Plugins ordered by plugin name.");
+    out.println();
+
     collect.entrySet()
         .stream()
         .sorted(Map.Entry.comparingByKey())
@@ -127,7 +129,17 @@ class MavenPluginStatisticsTest {
     out.println("---------------------------------------------------------------------------");
     out.printf(" %-36s %,15d%n", "numberOfDownloads of downloads in total:", numberOfDownloadsTotal);
 
+    out.println("---------------------------------------------------------------------------");
+    out.println(" Plugins ordered by downloads.");
+    out.println();
 
+    collect.entrySet()
+        .stream()
+        .sorted(Comparator.<Map.Entry<String, LongSummaryStatistics>>comparingLong(e -> e.getValue().getSum()).reversed())
+        .forEach(plugin -> {
+          double percentage = plugin.getValue().getSum() / (double)numberOfDownloadsTotal * 100;
+          out.printf(" %-36s %,15d %6.2f%n", plugin.getKey(), plugin.getValue().getSum(), percentage);
+        });
 
     out.println("---------------------------------------------------------------------------");
     out.printf("Number of default plugins used: %3d%n", DEFAULT_MAVEN_PLUGINS.size());
