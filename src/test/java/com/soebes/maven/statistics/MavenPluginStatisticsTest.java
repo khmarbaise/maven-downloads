@@ -114,7 +114,7 @@ class MavenPluginStatisticsTest {
         .mapToLong(LongSummaryStatistics::getSum).sum();
 
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     out.println(" Plugins ordered by plugin name.");
     out.println();
 
@@ -126,10 +126,10 @@ class MavenPluginStatisticsTest {
           out.printf(" %-36s %,15d %6.2f%n", plugin.getKey(), plugin.getValue().getSum(), percentage);
         });
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     out.printf(" %-36s %,15d%n", "numberOfDownloads of downloads in total:", numberOfDownloadsTotal);
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     out.println(" Plugins ordered by downloads.");
     out.println();
 
@@ -141,15 +141,15 @@ class MavenPluginStatisticsTest {
           out.printf(" %-36s %,15d %6.2f%n", plugin.getKey(), plugin.getValue().getSum(), percentage);
         });
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     out.printf("Number of default plugins used: %3d%n", DEFAULT_MAVEN_PLUGINS.size());
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     collect.entrySet()
         .stream()
         .filter(k -> DEFAULT_MAVEN_PLUGINS.contains(k.getKey()))
         .forEach(plugin -> out.printf(" %-36s %,15d%n", plugin.getKey() , plugin.getValue().getSum()));
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     var numberOfDownloadsSelectedPlugins = collect.entrySet()
         .stream()
         .filter(k -> DEFAULT_MAVEN_PLUGINS.contains(k.getKey()))

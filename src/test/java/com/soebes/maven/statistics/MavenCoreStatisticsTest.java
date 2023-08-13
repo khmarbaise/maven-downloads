@@ -98,8 +98,7 @@ class MavenCoreStatisticsTest {
 
     out.printf("totalOfDownloadsOverallMavenVersions: %,12d%n", totalOfDownloadsOverallMavenVersions);
 
-    out.println("---------------------------------------------------------------------------");
-
+    out.println("-".repeat(60));
     var groupedByMavenVersion = mavenVersionStatistics.stream()
         .flatMap(s -> s.lines().stream())
         .collect(Collectors.groupingBy(MavenStats::version, Collectors.summingLong(MavenStats::numberOfDownloads)));
@@ -111,10 +110,10 @@ class MavenCoreStatisticsTest {
 
 
     var sum = groupedByMavenVersion.values().stream().mapToLong(l -> l).sum();
-    out.printf("%-15s %-12s%n", "=============", "============");
+    out.printf("%-15s %-12s%n", "=".repeat(13), "=".repeat(12));
     out.printf("%-15s %,12d%n", " ", sum);
 
-    out.println("---------------------------------------------------------------------------");
+    out.println("-".repeat(60));
     groupedByMavenVersion
         .entrySet()
         .stream().sorted(Map.Entry.<ComparableVersion, Long>comparingByValue().reversed())
