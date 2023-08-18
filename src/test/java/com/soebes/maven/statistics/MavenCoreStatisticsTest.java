@@ -72,7 +72,7 @@ class MavenCoreStatisticsTest {
         .toList();
   }
 
-  Comparator<YearMonth> YEAR_MONTH_COMPARATOR = Comparator
+  Comparator<YearMonth> byYearAndMonth = Comparator
       .comparingInt(YearMonth::year)
       .thenComparingInt(YearMonth::month);
 
@@ -82,7 +82,7 @@ class MavenCoreStatisticsTest {
     var mavenVersionStatistics = readCSVStatistics(rootDirectory);
 
     mavenVersionStatistics
-        .stream().sorted(YEAR_MONTH_COMPARATOR)
+        .stream().sorted(byYearAndMonth)
         .forEach(s -> {
           var totalOverAllVersions = s.lines()
               .stream()
