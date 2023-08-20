@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
@@ -21,6 +23,9 @@ import static java.lang.System.out;
  * Grouping the Apache repository statistics.
  */
 class MavenCoreStatisticsTest {
+
+  static final Function<String, String[]> splitByComma = s -> s.split(",");
+  static final Predicate<Path> apacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats");
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
     static MavenStats of(Line line) {
@@ -36,7 +41,7 @@ class MavenCoreStatisticsTest {
 
   static List<MavenStats> convert(Path csvFile) {
     try (var lines = Files.lines(csvFile)) {
-      return lines.map(s -> s.split(","))
+      return lines.map(splitByComma)
           .map(arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2])))
           .map(MavenStats::of)
           .toList();
@@ -62,7 +67,7 @@ class MavenCoreStatisticsTest {
     var filesInDirectory = allFilesInDirectoryTree(rootDirectory);
 
     var listOfSelectedFiles = filesInDirectory.stream()
-        .filter(s -> s.getFileName().toString().startsWith("apache-maven-stats"))
+        .filter(apacheMavenStatisticFiles)
         .toList();
 
     return listOfSelectedFiles
