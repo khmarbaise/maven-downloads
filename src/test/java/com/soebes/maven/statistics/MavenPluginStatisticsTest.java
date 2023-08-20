@@ -23,6 +23,7 @@ import static java.lang.System.out;
 class MavenPluginStatisticsTest {
 
   static final Function<String, String[]> splitByComa = s -> s.split(",");
+  static final String HEAD_LINE = "-".repeat(60);
   List<String> DEFAULT_MAVEN_PLUGINS = List.of(
       "maven-clean-plugin",
       "maven-compiler-plugin",
@@ -144,7 +145,7 @@ class MavenPluginStatisticsTest {
     out.println("-".repeat(60));
     out.printf(" %-36s %,15d%n", "numberOfDownloads of downloads in total:", numberOfDownloadsTotal);
 
-    out.println("-".repeat(60));
+    out.println(HEAD_LINE);
     out.println(" Plugins ordered by downloads.");
     out.println();
 

@@ -26,9 +26,10 @@ import static java.lang.System.out;
 class MavenCoreStatisticsTest {
 
   static final Function<String, String[]> splitByComma = s -> s.split(",");
-  static final Predicate<Path> apacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats");
+  static final Predicate<Path> onlyApacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats");
   static final Function<String[], Line> toLine = arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2]));
   static final ToLongFunction<Long> identity = __ -> __;
+  static final String HEAD_LINE = "-".repeat(60);
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
     static MavenStats of(Line line) {
@@ -79,7 +80,7 @@ class MavenCoreStatisticsTest {
     var filesInDirectory = allFilesInDirectoryTree(rootDirectory);
 
     var listOfSelectedFiles = filesInDirectory.stream()
-        .filter(apacheMavenStatisticFiles)
+        .filter(onlyApacheMavenStatisticFiles)
         .toList();
 
     return listOfSelectedFiles
@@ -99,7 +100,8 @@ class MavenCoreStatisticsTest {
     var mavenVersionStatistics = readCSVStatistics(rootDirectory);
 
     mavenVersionStatistics
-        .stream().sorted(byYearAndMonth)
+        .stream()
+        .sorted(byYearAndMonth)
         .forEach(s -> {
           var totalOverAllVersions = s.lines()
               .stream()
@@ -115,7 +117,7 @@ class MavenCoreStatisticsTest {
 
     out.printf("totalOfDownloadsOverallMavenVersions: %,12d%n", totalOfDownloadsOverallMavenVersions);
 
-    out.println("-".repeat(60));
+    out.println(HEAD_LINE);
     var groupedByMavenVersion = mavenVersionStatistics.stream()
         .flatMap(s -> s.lines().stream())
         .collect(Collectors.groupingBy(MavenStats::version, Collectors.summingLong(MavenStats::numberOfDownloads)));
@@ -124,7 +126,6 @@ class MavenCoreStatisticsTest {
         .entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .forEach(s -> out.printf("%-15s %,12d%n", s.getKey(), s.getValue()));
-
 
     var sum = groupedByMavenVersion.values().stream().mapToLong(l -> l).sum();
     out.printf("%-15s %-12s%n", "=".repeat(13), "=".repeat(12));
