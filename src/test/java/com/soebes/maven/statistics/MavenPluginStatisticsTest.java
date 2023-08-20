@@ -56,10 +56,18 @@ class MavenPluginStatisticsTest {
   record YearMonthFile(int year, int month, Path fileName) {
     static YearMonthFile of(Path fileName) {
       String fileNameOnly = fileName.getFileName().toString();
-      int month = Integer.parseInt(fileNameOnly.substring(fileNameOnly.length() - 13, fileNameOnly.length() - 11));
-      int year = Integer.parseInt(fileNameOnly.substring(fileNameOnly.length() - 18, fileNameOnly.length() - 14));
+      int month = Integer.parseInt(extractMonthFromFilename(fileNameOnly));
+      int year = Integer.parseInt(extractYearFromFilename(fileNameOnly));
       return new YearMonthFile(year, month, fileName);
     }
+  }
+
+  private static String extractYearFromFilename(String fileNameOnly) {
+    return fileNameOnly.substring(fileNameOnly.length() - 18, fileNameOnly.length() - 14);
+  }
+
+  private static String extractMonthFromFilename(String fileNameOnly) {
+    return fileNameOnly.substring(fileNameOnly.length() - 13, fileNameOnly.length() - 11);
   }
 
   Comparator<YearMonth> byYearAndMonth = Comparator
