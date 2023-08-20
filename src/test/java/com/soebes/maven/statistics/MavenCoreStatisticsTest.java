@@ -26,6 +26,7 @@ class MavenCoreStatisticsTest {
 
   static final Function<String, String[]> splitByComma = s -> s.split(",");
   static final Predicate<Path> apacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats");
+  static final Function<String[], Line> toLine = arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2]));
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
     static MavenStats of(Line line) {
@@ -42,7 +43,7 @@ class MavenCoreStatisticsTest {
   static List<MavenStats> convert(Path csvFile) {
     try (var lines = Files.lines(csvFile)) {
       return lines.map(splitByComma)
-          .map(arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2])))
+          .map(toLine)
           .map(MavenStats::of)
           .toList();
     } catch (IOException e) {
@@ -55,12 +56,21 @@ class MavenCoreStatisticsTest {
   }
 
   record YearMonthFile(int year, int month, Path fileName) {
-    static YearMonthFile of (Path fileName) {
+    static YearMonthFile of(Path fileName) {
       String fileNameOnly = fileName.getFileName().toString();
-      int month = Integer.parseInt(fileNameOnly.substring(fileNameOnly.length() - 6, fileNameOnly.length() - 4));
-      int year = Integer.parseInt(fileNameOnly.substring(fileNameOnly.length() - 11, fileNameOnly.length() - 7));
+      int month = Integer.parseInt(extractMonthOutOfFilename(fileNameOnly));
+      int year = Integer.parseInt(extractYearOutOfFilename(fileNameOnly));
       return new YearMonthFile(year, month, fileName);
     }
+
+  }
+
+  private static String extractYearOutOfFilename(String fileNameOnly) {
+    return fileNameOnly.substring(fileNameOnly.length() - 11, fileNameOnly.length() - 7);
+  }
+
+  private static String extractMonthOutOfFilename(String fileNameOnly) {
+    return fileNameOnly.substring(fileNameOnly.length() - 6, fileNameOnly.length() - 4);
   }
 
   static List<YearMonth> readCSVStatistics(Path rootDirectory) throws IOException {
