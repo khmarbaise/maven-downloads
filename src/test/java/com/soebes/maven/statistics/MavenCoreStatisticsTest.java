@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
@@ -27,6 +28,7 @@ class MavenCoreStatisticsTest {
   static final Function<String, String[]> splitByComma = s -> s.split(",");
   static final Predicate<Path> apacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats");
   static final Function<String[], Line> toLine = arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2]));
+  static final ToLongFunction<Long> identity = __ -> __;
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
     static MavenStats of(Line line) {
@@ -109,7 +111,7 @@ class MavenCoreStatisticsTest {
     var totalOfDownloadsOverallMavenVersions = mavenVersionStatistics
         .stream()
         .map(s -> s.lines().stream().mapToLong(MavenStats::numberOfDownloads).sum())
-        .mapToLong(__ -> __).sum();
+        .mapToLong(identity).sum();
 
     out.printf("totalOfDownloadsOverallMavenVersions: %,12d%n", totalOfDownloadsOverallMavenVersions);
 
