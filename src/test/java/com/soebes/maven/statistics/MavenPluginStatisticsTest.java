@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
@@ -19,6 +22,7 @@ import static java.lang.System.out;
 
 class MavenPluginStatisticsTest {
 
+  static final Function<String, String[]> splitByComa = s -> s.split(",");
   List<String> DEFAULT_MAVEN_PLUGINS = List.of(
       "maven-clean-plugin",
       "maven-compiler-plugin",
@@ -58,7 +62,7 @@ class MavenPluginStatisticsTest {
     }
   }
 
-  Comparator<YearMonth> YEAR_MONTH_COMPARATOR = Comparator
+  Comparator<YearMonth> byYearAndMonth = Comparator
       .comparingInt(YearMonth::year)
       .thenComparingInt(YearMonth::month);
   record YearMonth (int year, int month, List<MavenPlugin> lines) {
@@ -66,7 +70,7 @@ class MavenPluginStatisticsTest {
 
   static List<MavenPlugin> convert(Path csvFile) {
     try (var lines = Files.lines(csvFile)) {
-      return lines.map(s -> s.split(","))
+      return lines.map(splitByComa)
           .map(arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2])))
           .map(MavenPlugin::of)
           .toList();
@@ -75,13 +79,16 @@ class MavenPluginStatisticsTest {
     }
   }
 
+  private final Predicate<Path> byApacheMavenPlugins = s -> s.getFileName().toString().startsWith("org-apache-maven-plugins");
+
+  private final Comparator<MavenPlugin> byPlugin = Comparator.comparing(MavenPlugin::plugin);
 
   void mavenPluginStatistics(Path rootDirectory) throws IOException {
     out.println("Apache Maven Plugins Statistics");
 
     var paths = allFilesInDirectoryTree(rootDirectory);
     var listOfFiles = paths.stream()
-        .filter(s -> s.getFileName().toString().startsWith("org-apache-maven-plugins"))
+        .filter(byApacheMavenPlugins)
         .toList();
 
     var mavenPluginStatistics = listOfFiles.stream()
@@ -90,13 +97,13 @@ class MavenPluginStatisticsTest {
         .toList();
 
     mavenPluginStatistics.stream()
-        .sorted(YEAR_MONTH_COMPARATOR)
+        .sorted(byYearAndMonth)
         .forEach(s -> {
           var sumOfDownloadsPerMonth = s.lines().stream().mapToLong(MavenPlugin::numberOfDownloads).sum();
           out.printf("Year: %04d Month: %02d Number of plugins: %3d downloads: %,15d %n", s.year(), s.month(), s.lines().size(), sumOfDownloadsPerMonth);
 
           s.lines().stream()
-              .sorted(Comparator.comparing(MavenPlugin::plugin))
+              .sorted(byPlugin)
               .forEachOrdered(l -> out.printf(" %-36s %,10d%n", l.plugin(), l.numberOfDownloads()));
 
         });
@@ -146,14 +153,16 @@ class MavenPluginStatisticsTest {
     out.println("-".repeat(60));
     collect.entrySet()
         .stream()
-        .filter(k -> DEFAULT_MAVEN_PLUGINS.contains(k.getKey()))
+        .filter(plugin -> DEFAULT_MAVEN_PLUGINS.contains(plugin.getKey()))
         .forEach(plugin -> out.printf(" %-36s %,15d%n", plugin.getKey() , plugin.getValue().getSum()));
+
+    final ToLongFunction<Map.Entry<String, LongSummaryStatistics>> theValue = s -> s.getValue().getSum();
 
     out.println("-".repeat(60));
     var numberOfDownloadsSelectedPlugins = collect.entrySet()
         .stream()
-        .filter(k -> DEFAULT_MAVEN_PLUGINS.contains(k.getKey()))
-        .mapToLong(s -> s.getValue().getSum()).sum();
+        .filter(plugin -> DEFAULT_MAVEN_PLUGINS.contains(plugin.getKey()))
+        .mapToLong(theValue).sum();
 
     out.printf(" %-36s %,15d%n", "numberOfDownloadsSelectedPlugins:", numberOfDownloadsSelectedPlugins);
   }
