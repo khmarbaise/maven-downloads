@@ -14,11 +14,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
-import java.util.stream.Collectors;
 
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
 import static com.soebes.maven.statistics.Utility.unquote;
 import static java.lang.System.out;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingLong;
 
 /**
  * Grouping the Apache repository statistics.
@@ -105,7 +106,8 @@ class MavenCoreStatisticsTest {
         .forEach(s -> {
           var totalOverAllVersions = s.lines()
               .stream()
-              .mapToLong(MavenStats::numberOfDownloads).sum();
+              .mapToLong(MavenStats::numberOfDownloads)
+              .sum();
           out.printf("Year: %04d %02d %,10d %4d %n", s.year(), s.month(), totalOverAllVersions, s.lines().size());
         });
 
@@ -120,21 +122,27 @@ class MavenCoreStatisticsTest {
     out.println(HEAD_LINE);
     var groupedByMavenVersion = mavenVersionStatistics.stream()
         .flatMap(s -> s.lines().stream())
-        .collect(Collectors.groupingBy(MavenStats::version, Collectors.summingLong(MavenStats::numberOfDownloads)));
+        .collect(groupingBy(MavenStats::version, summingLong(MavenStats::numberOfDownloads)));
 
     groupedByMavenVersion
         .entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
+        .stream()
+        .sorted(Map.Entry.comparingByKey())
         .forEach(s -> out.printf("%-15s %,12d%n", s.getKey(), s.getValue()));
 
-    var sum = groupedByMavenVersion.values().stream().mapToLong(l -> l).sum();
+    var sum = groupedByMavenVersion
+        .values()
+        .stream()
+        .mapToLong(identity)
+        .sum();
     out.printf("%-15s %-12s%n", "=".repeat(13), "=".repeat(12));
     out.printf("%-15s %,12d%n", " ", sum);
 
     out.println("-".repeat(60));
     groupedByMavenVersion
         .entrySet()
-        .stream().sorted(Map.Entry.<ComparableVersion, Long>comparingByValue().reversed())
+        .stream()
+        .sorted(Map.Entry.<ComparableVersion, Long>comparingByValue().reversed())
         .forEach(s -> {
           double percentage = s.getValue() / (double)sum * 100.0;
           out.printf("%-15s %,12d %6.2f%n", s.getKey(), s.getValue(), percentage);
