@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
@@ -18,6 +17,8 @@ import java.util.function.ToLongFunction;
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
 import static com.soebes.maven.statistics.Utility.unquote;
 import static java.lang.System.out;
+import static java.util.Map.Entry.comparingByKey;
+import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingLong;
 
@@ -103,7 +104,7 @@ class MavenCoreStatisticsTest {
     mavenVersionStatistics
         .stream()
         .sorted(byYearAndMonth)
-        .forEach(s -> {
+        .forEachOrdered(s -> {
           var totalOverAllVersions = s.lines()
               .stream()
               .mapToLong(MavenStats::numberOfDownloads)
@@ -127,8 +128,8 @@ class MavenCoreStatisticsTest {
     groupedByMavenVersion
         .entrySet()
         .stream()
-        .sorted(Map.Entry.comparingByKey())
-        .forEach(s -> out.printf("%-15s %,12d%n", s.getKey(), s.getValue()));
+        .sorted(comparingByKey())
+        .forEachOrdered(s -> out.printf("%-15s %,12d%n", s.getKey(), s.getValue()));
 
     var sum = groupedByMavenVersion
         .values()
@@ -142,8 +143,8 @@ class MavenCoreStatisticsTest {
     groupedByMavenVersion
         .entrySet()
         .stream()
-        .sorted(Map.Entry.<ComparableVersion, Long>comparingByValue().reversed())
-        .forEach(s -> {
+        .sorted(comparingByValue(Comparator.reverseOrder()))
+        .forEachOrdered(s -> {
           double percentage = s.getValue() / (double)sum * 100.0;
           out.printf("%-15s %,12d %6.2f%n", s.getKey(), s.getValue(), percentage);
         });

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
 import static com.soebes.maven.statistics.Utility.unquote;
 import static java.lang.System.out;
+import static java.util.Map.Entry.comparingByKey;
 
 class MavenPluginStatisticsTest {
 
@@ -120,12 +121,12 @@ class MavenPluginStatisticsTest {
     record PluginDownloadNumber(String plugin, long numberOfDownloads) {
 
     }
-    var collect = mavenPluginStatistics.stream()
+    var mavenAndStatistics = mavenPluginStatistics.stream()
         .flatMap(s -> s.lines().stream())
         .map(s -> new PluginDownloadNumber(s.plugin(), s.numberOfDownloads()))
         .collect(Collectors.groupingBy(PluginDownloadNumber::plugin, Collectors.summarizingLong(PluginDownloadNumber::numberOfDownloads)));
 
-    var numberOfDownloadsTotal = collect.values()
+    var numberOfDownloadsTotal = mavenAndStatistics.values()
         .stream()
         .mapToLong(LongSummaryStatistics::getSum).sum();
 
@@ -134,10 +135,10 @@ class MavenPluginStatisticsTest {
     out.println(" Plugins ordered by plugin name.");
     out.println();
 
-    collect.entrySet()
+    mavenAndStatistics.entrySet()
         .stream()
-        .sorted(Map.Entry.comparingByKey())
-        .forEach(plugin -> {
+        .sorted(comparingByKey())
+        .forEachOrdered(plugin -> {
           double percentage = plugin.getValue().getSum() / (double)numberOfDownloadsTotal * 100;
           out.printf(" %-36s %,15d %6.2f%n", plugin.getKey(), plugin.getValue().getSum(), percentage);
         });
@@ -149,10 +150,10 @@ class MavenPluginStatisticsTest {
     out.println(" Plugins ordered by downloads.");
     out.println();
 
-    collect.entrySet()
+    mavenAndStatistics.entrySet()
         .stream()
-        .sorted(Comparator.<Map.Entry<String, LongSummaryStatistics>>comparingLong(e -> e.getValue().getSum()).reversed())
-        .forEach(plugin -> {
+        .sorted(Comparator.comparing(e -> e.getValue().getSum(), Comparator.reverseOrder()))
+        .forEachOrdered(plugin -> {
           double percentage = plugin.getValue().getSum() / (double)numberOfDownloadsTotal * 100;
           out.printf(" %-36s %,15d %6.2f%n", plugin.getKey(), plugin.getValue().getSum(), percentage);
         });
@@ -160,7 +161,7 @@ class MavenPluginStatisticsTest {
     out.println("-".repeat(60));
     out.printf("Number of default plugins used: %3d%n", DEFAULT_MAVEN_PLUGINS.size());
     out.println("-".repeat(60));
-    collect.entrySet()
+    mavenAndStatistics.entrySet()
         .stream()
         .filter(plugin -> DEFAULT_MAVEN_PLUGINS.contains(plugin.getKey()))
         .forEach(plugin -> out.printf(" %-36s %,15d%n", plugin.getKey() , plugin.getValue().getSum()));
@@ -168,7 +169,7 @@ class MavenPluginStatisticsTest {
     final ToLongFunction<Map.Entry<String, LongSummaryStatistics>> theValue = s -> s.getValue().getSum();
 
     out.println("-".repeat(60));
-    var numberOfDownloadsSelectedPlugins = collect.entrySet()
+    var numberOfDownloadsSelectedPlugins = mavenAndStatistics.entrySet()
         .stream()
         .filter(plugin -> DEFAULT_MAVEN_PLUGINS.contains(plugin.getKey()))
         .mapToLong(theValue).sum();
