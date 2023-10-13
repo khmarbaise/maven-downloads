@@ -18,7 +18,7 @@
   <name>Apache Maven Downloads</name>
 
   <properties>
-    <maven.compiler.release>20</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
   </properties>
   <dependencyManagement>
     <dependencies>
