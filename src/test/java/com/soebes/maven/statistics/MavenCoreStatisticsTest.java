@@ -34,9 +34,7 @@ class MavenCoreStatisticsTest {
   static final String HEAD_LINE = "-".repeat(60);
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
-    static MavenStats of(Line line) {
-      return new MavenStats(line.version(), line.numberOfDownloads(), line.relativeNumber());
-    }
+    static Function<Line, MavenStats> of = line -> new MavenStats(line.version(), line.numberOfDownloads(), line.relativeNumber());
   }
 
   record Line(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
@@ -49,7 +47,7 @@ class MavenCoreStatisticsTest {
     try (var lines = Files.lines(csvFile)) {
       return lines.map(splitByComma)
           .map(toLine)
-          .map(MavenStats::of)
+          .map(MavenStats.of)
           .toList();
     } catch (IOException e) {
       //Translate into RuntimeException.
