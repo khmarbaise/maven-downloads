@@ -30,3 +30,7 @@ This will extract some useful information from the files.
 * Maven 3.8.6+
 * JDK17+ (build and runtime.)
 
+== TODO
+
+* Added some more information based on Major version, Minor Version
+* Quarter Statistics
