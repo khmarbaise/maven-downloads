@@ -28,7 +28,7 @@ This will extract some useful information from the files.
 == Requirements
 
 * Maven 3.8.6+
-* JDK17+ (build and runtime.)
+* JDK21+ (build and runtime.)
 
 == TODO
 
