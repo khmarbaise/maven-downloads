@@ -21,6 +21,10 @@
 Collected downloads for Apache Maven and Apache Maven Plugins.
 This will extract some useful information from the files.
 
+This repository is related to the blog post:
+
+https://blog.soebes.io/posts/2023/08/2023-08-06-download-statistics-for-maven/
+
 == State
 
 * Working on it.
