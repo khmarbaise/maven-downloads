@@ -31,7 +31,7 @@ https://blog.soebes.io/posts/2023/08/2023-08-06-download-statistics-for-maven/
 
 == Requirements
 
-* Maven 3.8.6+
+* Maven 3.9.6+
 * JDK21+ (build and runtime.)
 
 == TODO

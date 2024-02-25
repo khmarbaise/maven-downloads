@@ -61,8 +61,8 @@ class MavenCoreStatisticsTest {
   record YearMonthFile(int year, int month, Path fileName) {
     static YearMonthFile of(Path fileName) {
       String fileNameOnly = fileName.getFileName().toString();
-      int month = Integer.parseInt(extractMonthOutOfFilename(fileNameOnly));
-      int year = Integer.parseInt(extractYearOutOfFilename(fileNameOnly));
+      var month = Integer.parseInt(extractMonthOutOfFilename(fileNameOnly));
+      var year = Integer.parseInt(extractYearOutOfFilename(fileNameOnly));
       return new YearMonthFile(year, month, fileName);
     }
 
@@ -143,7 +143,7 @@ class MavenCoreStatisticsTest {
         .stream()
         .sorted(comparingByValue(Comparator.reverseOrder()))
         .forEachOrdered(s -> {
-          double percentage = s.getValue() / (double)sum * 100.0;
+          var percentage = s.getValue() / (double)sum * 100.0;
           out.printf("%-15s %,12d %6.2f%n", s.getKey(), s.getValue(), percentage);
         });
 
