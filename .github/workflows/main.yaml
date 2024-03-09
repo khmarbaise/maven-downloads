@@ -30,13 +30,18 @@ jobs:
     name: Linux
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v3
-      - name: 'Setup Java Version'
+      - uses: actions/checkout@v3
+      - run: |
+          download_url="https://download.java.net/java/GA/jdk22/830ec9fcccef480bb3e73fb7ecafe059/36/GPL/openjdk-22_linux-x64_bin.tar.gz"
+          wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
+      - name: 'Set up JDK 22'
         uses: actions/setup-java@v3
         with:
-          java-version: 21
-          distribution: 'temurin'
-          cache: maven
+          distribution: 'jdkfile'
+          jdkFile: ${{ runner.temp }}/java_package.tar.gz
+          java-version: 22-ea
+          cache: 'maven'
+          check-latest: true
       - name: 'Build'
-        run: mvn -V --no-transfer-progress verify
+        shell: bash
+        run: mvn -V --no-transfer-progress clean verify --fail-at-end
