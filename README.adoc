@@ -38,3 +38,6 @@ https://blog.soebes.io/posts/2023/08/2023-08-06-download-statistics-for-maven/
 
 * Added some more information based on Major version, Minor Version
 * Quarter Statistics
+
+== Status
+* The data of October 2023 is missing.
