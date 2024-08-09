@@ -25,7 +25,7 @@ class MavenPluginStatisticsTest {
 
   static final Function<String, String[]> splitByComa = s -> s.split(",");
   static final String HEAD_LINE = "-".repeat(60);
-  List<String> DEFAULT_MAVEN_PLUGINS = List.of(
+  static final List<String> DEFAULT_MAVEN_PLUGINS = List.of(
       "maven-clean-plugin",
       "maven-compiler-plugin",
       "maven-dependency-plugin",
