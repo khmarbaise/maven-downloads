@@ -42,6 +42,10 @@ jobs:
           java-version: 22-ea
           cache: 'maven'
           check-latest: true
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.8
       - name: 'Build'
         shell: bash
         run: mvn -V --no-transfer-progress clean verify --fail-at-end
