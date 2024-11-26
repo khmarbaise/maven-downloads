@@ -155,7 +155,7 @@ class MavenPluginStatisticsTest {
         });
 
     out.println("-".repeat(60));
-    out.printf(" %-36s %,15d%n", "numberOfDownloads of downloads in total:", numberOfDownloadsTotal);
+    out.printf(" %-36s %,15d%n", "total of downloads:", numberOfDownloadsTotal);
 
     out.println(HEAD_LINE);
     out.println(" Plugins ordered by downloads.");
