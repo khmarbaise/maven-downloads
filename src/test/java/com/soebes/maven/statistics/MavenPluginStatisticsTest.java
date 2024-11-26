@@ -89,7 +89,7 @@ class MavenPluginStatisticsTest {
     }
   }
 
-  private final Predicate<Path> byApacheMavenPlugins = s -> s.getFileName().toString().startsWith("org-apache-maven-plugins");
+  private final Predicate<Path> byApacheMavenPlugins = s -> s.getFileName().toString().startsWith("org-apache-maven-plugins-");
 
   private final Comparator<MavenPlugin> byPlugin = Comparator.comparing(MavenPlugin::plugin);
 
