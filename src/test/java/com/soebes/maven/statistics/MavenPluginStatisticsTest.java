@@ -25,6 +25,15 @@ class MavenPluginStatisticsTest {
 
   static final Function<String, String[]> splitByComa = s -> s.split(",");
   static final String HEAD_LINE = "-".repeat(60);
+
+  /**
+   * A list of artifact id's which are not really plugins.
+   */
+  static final List<String> NON_PLUGINS = List.of(
+      "maven-plugins",
+      "maven-plugin-parent"
+  );
+
   static final List<String> DEFAULT_MAVEN_PLUGINS = List.of(
       "maven-clean-plugin",
       "maven-compiler-plugin",
@@ -83,13 +92,15 @@ class MavenPluginStatisticsTest {
       return lines.map(splitByComa)
           .map(arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2])))
           .map(MavenPlugin::of)
+          // Filter out non plugins.
+          .filter(plugin -> !NON_PLUGINS.contains(plugin.plugin()))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private final Predicate<Path> byApacheMavenPlugins = s -> s.getFileName().startsWith("org-apache-maven-plugins-");
+  private final Predicate<Path> byApacheMavenPlugins = s -> s.getFileName().toString().startsWith("org-apache-maven-plugins-");
 
   private final Comparator<MavenPlugin> byPlugin = Comparator.comparing(MavenPlugin::plugin);
 

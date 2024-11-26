@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.summingLong;
 class MavenCoreStatisticsTest {
 
   static final Function<String, String[]> splitByComma = s -> s.split(",");
-  static final Predicate<Path> onlyApacheMavenStatisticFiles = s -> s.getFileName().startsWith("apache-maven-stats-");
+  static final Predicate<Path> onlyApacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats-");
   static final Function<String[], Line> toLine = arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2]));
   static final ToLongFunction<Long> identity = __ -> __;
   static final String HEAD_LINE = "-".repeat(60);
