@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.soebes.smpp</groupId>
     <artifactId>smpp</artifactId>
-    <version>7.0.0</version>
+    <version>7.0.1</version>
     <relativePath/>
   </parent>
 
@@ -19,6 +19,8 @@
 
   <properties>
     <maven.compiler.release>24</maven.compiler.release>
+    <!-- Need to deactivate JaCoCo, until a version is released which supports JDK 24 -->
+    <jacoco.skip>true</jacoco.skip>
   </properties>
   <dependencyManagement>
     <dependencies>
