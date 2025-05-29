@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToLongFunction;
 
 import static com.soebes.maven.statistics.FileSelector.allFilesInDirectoryTree;
 import static com.soebes.maven.statistics.Utility.unquote;
@@ -30,7 +29,6 @@ class MavenCoreStatisticsTest {
   static final Function<String, String[]> splitByComma = s -> s.split(",");
   static final Predicate<Path> onlyApacheMavenStatisticFiles = s -> s.getFileName().toString().startsWith("apache-maven-stats-");
   static final Function<String[], Line> toLine = arr -> Line.of(unquote(arr[0]), unquote(arr[1]), unquote(arr[2]));
-  static final ToLongFunction<Long> identity = __ -> __;
   static final String HEAD_LINE = "-".repeat(60);
 
   record MavenStats(ComparableVersion version, long numberOfDownloads, double relativeNumber) {
@@ -114,7 +112,7 @@ class MavenCoreStatisticsTest {
     var totalOfDownloadsOverallMavenVersions = mavenVersionStatistics
         .stream()
         .map(s -> s.lines().stream().mapToLong(MavenStats::numberOfDownloads).sum())
-        .mapToLong(identity).sum();
+        .mapToLong(Long::longValue).sum();
 
     out.printf("totalOfDownloadsOverallMavenVersions: %,12d%n", totalOfDownloadsOverallMavenVersions);
 
@@ -132,7 +130,7 @@ class MavenCoreStatisticsTest {
     var sum = groupedByMavenVersion
         .values()
         .stream()
-        .mapToLong(identity)
+        .mapToLong(Long::longValue)
         .sum();
     out.printf("%-15s %-12s%n", "=".repeat(13), "=".repeat(12));
     out.printf("%-15s %,12d%n", " ", sum);
